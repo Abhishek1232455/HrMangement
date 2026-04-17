@@ -52,10 +52,14 @@ const Login = () => {
         }
         navigate('/dashboard');
       } catch (err) {
-        setError(err.response?.data?.msg || 'Google login failed');
+        setError(err.response?.data?.msg || 'Google login failed. Please try again.');
       }
     },
-    onError: () => setError('Google login failed')
+    onError: (err) => {
+      console.error('Google OAuth error:', err);
+      setError('Google sign-in was cancelled or failed. Please try again.');
+    },
+    scope: 'email profile',
   });
 
   return (
@@ -107,7 +111,14 @@ const Login = () => {
           <div className="flex-grow border-t border-white/80"></div>
         </div>
 
-        <button type="button" onClick={() => loginWithGoogle()} className="w-full h-[46px] bg-white/80 backdrop-blur-xl text-slate-700 font-extrabold text-[13px] rounded-[23px] flex items-center justify-center transition-all shadow-sm border border-white/80 hover:-translate-y-0.5 hover:bg-white hover:shadow-md">
+        <button type="button" onClick={() => {
+          const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+          if (!clientId || clientId === 'YOUR_GOOGLE_CLIENT_ID_HERE') {
+            setError('Google login is not configured. Please add VITE_GOOGLE_CLIENT_ID to frontend/.env');
+            return;
+          }
+          loginWithGoogle();
+        }} className="w-full h-[46px] bg-white/80 backdrop-blur-xl text-slate-700 font-extrabold text-[13px] rounded-[23px] flex items-center justify-center transition-all shadow-sm border border-white/80 hover:-translate-y-0.5 hover:bg-white hover:shadow-md">
           <GoogleIcon />
           <span>Sign In with Google</span>
         </button>
