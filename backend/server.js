@@ -5,11 +5,23 @@ const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 const app = express();
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+const ALLOWED_ORIGINS = [
+  process.env.FRONTEND_URL || 'http://localhost:5173',
+  'http://localhost:5173',
+  'https://1clik.vercel.app',
+];
 
 // Middleware
 app.use(cors({
-  origin: FRONTEND_URL,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g. curl, Postman, mobile apps)
+    if (!origin) return callback(null, true);
+    if (ALLOWED_ORIGINS.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS: Origin ${origin} not allowed`));
+  },
   credentials: true
 }));
 app.use(express.json());
