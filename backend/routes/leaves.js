@@ -51,7 +51,7 @@ router.post('/', requireAuth, async (req, res) => {
 });
 
 // Update status
-router.put('/:id/status', requireAuth, requireAdmin, async (req, res) => {
+router.put('/:id/status', requireAuth, async (req, res) => {
   try {
     const { status } = req.body || {};
     if (!ALLOWED_LEAVE_STATUSES.has(status)) {
